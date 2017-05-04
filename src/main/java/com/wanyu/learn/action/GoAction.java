@@ -22,7 +22,7 @@ public class GoAction {
     @RequestMapping(value={"/index","/"},method = RequestMethod.GET)
     public String index(Model model) throws Exception{
         logger.info("====processed by index=====");
-        model.addAttribute("msg","I Love WangQing");
+        model.addAttribute("msg","Hi Welcome");
         return "success";
     }
 
