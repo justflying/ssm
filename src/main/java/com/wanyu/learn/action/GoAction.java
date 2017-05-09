@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class GoAction {
     private final Log logger= LogFactory.getLog(GoAction.class);
     //处理HEAD类型的"/"请求
-    @RequestMapping(value = {"/"},method={RequestMethod.HEAD})
+    @RequestMapping(value = {"/go"},method={RequestMethod.HEAD})
     public String head(){
         return "success";
     }
     //处理GET类型的"/index" 和"/"请求
-    @RequestMapping(value={"/index","/"},method = RequestMethod.GET)
+    @RequestMapping(value={"/go"},method = RequestMethod.GET)
     public String index(Model model) throws Exception{
         logger.info("====processed by index=====");
         model.addAttribute("msg","Hi Welcome");
