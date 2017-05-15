@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--  1. 配置 SecurityManager!  缓存管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+           <property name="cacheManager" ref="cacheManager"/>
+           <property name="realm" ref="shiroRealm"/>
+    </bean>
+    <!--  2. 配置缓存管理cacheManager 这里使用的是ehcache  需要加入相应的包-->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/>
+    </bean>
+
+    <!--  3.配置Realm  -->
+    <bean id="shiroRealm" class="com.wanyu.learn.shiro.ShiroRealm">
+        <!--配置前台表单传输密码加密方式-->
+            <property name="credentialsMatcher">
+                <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                    <property name="hashAlgorithmName" value="MD5"/>
+                    <property name="hashIterations" value="1024"/>
+                </bean>
+            </property>
+    </bean>
+    <!--  4. 配置LifecycleBeanPostProcessor  可以自动的来调用配置在 Spring IOC 容器中 shiro bean 的生命周期方法.  -->
+    <bean id="lifecycleBeanPostProcessor"  class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <!--  5. 启用IOC容器中shiro注解 必须在配置了LifecycleBeanProcesssor -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+    <!--  6. 6. 配置 ShiroFilter.
+          6.1 id 必须和 web.xml 文件中配置的 DelegatingFilterProxy 的 <filter-name> 一致.
+            若不一致, 则会抛出: NoSuchBeanDefinitionException.
+            因为 Shiro 会来 IOC 容器中查找和 <filter-name> 名字对应的 filter bean.
+    -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/login.jsp"/>
+        <property name="successUrl" value="/list.jsp"/>
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+        <property name="filterChainDefinitions">
+            <value>
+                /login.jsp = anon
+                /shiro/loginAdmin = anon
+                /shiro/admin =anon
+                /static/** = anon
+                /shiro/logout = logout
+                # everything else requires authentication:
+                /** = authc
+            </value>
+        </property>
+    </bean>
+</beans>
