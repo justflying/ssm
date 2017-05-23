@@ -18,8 +18,6 @@ import javax.annotation.Resource;
 @Controller
 @RequestMapping("/shiro")
 public class UserController {
-   @Resource
-   private UserMapper  userMapper;
 
    @RequestMapping("/loginAdmin")
    public String login(User user,Model model){
